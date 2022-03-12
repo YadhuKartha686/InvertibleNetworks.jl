@@ -61,3 +61,20 @@ N = Chain(N1, N2, N3, N4, N5, N6, N7, N8, N9, N10);
 g2 = gradient(X -> loss(X), X)
 
 @test g ≈ g2[1] rtol=1f-6
+
+## test Reverse network AD
+
+Nrev = reverse(N10)
+Xrev, ∂rev = rrule(Nrev, X)
+grev = ∂rev(Xrev-Y0)
+
+g2rev = gradient(X -> 0.5f0*norm(Nrev(X) - Y0)^2, X)
+
+@test grev[2] ≈ g2rev[1] rtol=1f-6
+
+G = NetworkMultiScaleHINT(1, n_hidden, 5, 5; split_scales=true, p2=0, k2=1);
+G1 = reverse(G);
+z = randn(Float32, nx*ny);
+G(randn(Float32, nx, ny, 1, 1));
+
+G1(z);

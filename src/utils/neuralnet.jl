@@ -89,6 +89,13 @@ struct ReverseNet <: ReverseNetwork
     network::InvertibleNetwork
 end
 
+using Zygote: @adjoint
+(G::ReverseNet)(z::Vector) = G.network.inverse(z)
+@adjoint function(G::ReverseNet)(z::Vector)
+    x = G.network.inverse(z)
+    return x, Δ -> (nothing, reverse(G.G).backward(Δ,x)[1])
+end
+
 function reverse(N::InvertibleNetwork)
     N_rev = deepcopy(N)
     tag_as_reversed!(N_rev, true)
@@ -151,4 +158,4 @@ function set_params!(RN::ReverseNetwork, θ::Array{Parameter, 1})
 end
 
 # Make invertible nets callable objects
-(N::Union{NeuralNetLayer,InvertibleNetwork})(X::AbstractArray{T,N} where {T, N}) = N.forward(X)
+(N::Union{NeuralNetLayer,InvertibleNetwork,Reverse,ReverseNet})(X::AbstractArray{T,N} where {T, N}) = N.forward(X)

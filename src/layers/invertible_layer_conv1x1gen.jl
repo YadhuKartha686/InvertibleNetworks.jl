@@ -97,7 +97,7 @@ function idmat(X::CuArray{T}; n::Union{Nothing,Int64}=nothing) where T
 end
 
 toConcreteArray(X::Adjoint{T,Array{T,N}}) where {T,N} = Array(X)
-toConcreteArray(X::Adjoint{T,CuArray{T,N,O}}) where {T,N,O} = CuArray(X)
+toConcreteArray(X::Adjoint{T,CuArray{T,N}}) where {T,N} = CuArray(X)
 
 # LU utils
 
