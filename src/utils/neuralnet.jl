@@ -93,7 +93,7 @@ using Zygote: @adjoint
 (G::ReverseNet)(z::Vector) = G.network.inverse(z)
 @adjoint function(G::ReverseNet)(z::Vector)
     x = G.network.inverse(z)
-    return x, Δ -> (nothing, reverse(G.G).backward(Δ,x)[1])
+    return x, Δ -> (nothing, reverse(G.network).backward(Δ,x)[1])
 end
 
 function reverse(N::InvertibleNetwork)
